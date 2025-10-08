@@ -1,0 +1,57 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo_website
+    restart: always
+    volumes:
+      - mongo_data_practice:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    #ports:
+    #  - 127.0.0.1:27017:27017
+    networks:
+      - wgs_network
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express_website
+    restart: always
+    #ports:
+    #  - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: wgs_mongo
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_EXPRESS_ROOT_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_EXPRESS_ROOT_PASSWORD}
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin
+      ME_CONFIG_BASICAUTH_ENABLE: 'true'
+    networks:
+      - wgs_network
+
+  workstation:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: workstation_website
+    restart: always
+    volumes:
+      - ./:/app
+    working_dir: /app
+    #ports:
+    #  - 127.0.0.1:80:80
+    depends_on:
+      - mongo
+    #networks:
+    #  - wgs_network
+    stdin_open: true
+    tty: true
+
+volumes:
+  mongo_data_practice:
+    external: true
+
+#networks:
+#  wgs_network:
+#    name: wgs_network
+#    driver: bridge
