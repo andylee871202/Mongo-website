@@ -7,4 +7,3 @@ scipy
 statsmodels
 pymongo
 django
-json
