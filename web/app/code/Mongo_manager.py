@@ -1,6 +1,10 @@
 import pymongo
+from pymongo import TEXT
+from pymongo.errors import OperationFailure
 import configparser
 import datetime
+from urllib.parse import quote_plus
+import re
 
 config = configparser.ConfigParser()
 config.read('/app/config.env')
@@ -13,13 +17,11 @@ class MongoManager:
         self.poem_collection = self.db['poem']
 
     def _get_root_mongodb_url(self):
-        root_username = config['MongoDB']['MONGO_ROOT_USERNAME']
-        root_password = config['MongoDB']['MONGO_ROOT_PASSWORD']
+        user = quote_plus(config['MongoDB']['MONGO_ROOT_USERNAME'])
+        pwd  = quote_plus(config['MongoDB']['MONGO_ROOT_PASSWORD'])
         host = config['MongoDB']['MONGO_HOST']
         port = config['MongoDB']['MONGO_PORT']
-        database = config['MongoDB']['MONGO_DATABASE']
-
-        return f"mongodb://{root_username}:{root_password}@{host}:{port}/{database}?authSource=admin"
+        return f"mongodb://{user}:{pwd}@{host}:{port}/?authSource=admin"
 
     def close(self):
         self.client.close()
